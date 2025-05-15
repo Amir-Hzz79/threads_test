@@ -7,8 +7,8 @@ import 'package:record/record.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:threads/core/models/post.dart';
 
-import '../../core/widgets/video_player.dart';
-import '../../core/widgets/voice_message_widget.dart';
+import '../../../core/widgets/video_player.dart';
+import '../../../core/widgets/voice_message_widget.dart';
 
 class NewPostPage extends StatefulWidget {
   const NewPostPage({Key? key}) : super(key: key);

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-
-import 'features/new_post/new_post_page.dart';
+import 'package:threads/features/home/pages/home_page.dart';
 
 void main() async {
   await WidgetsFlutterBinding.ensureInitialized();
@@ -51,7 +50,7 @@ class MyApp extends StatelessWidget {
           ),
         ),
         debugShowCheckedModeBanner: false,
-        home: NewPostPage(),
+        home: HomePage(),
       ),
     );
   }
