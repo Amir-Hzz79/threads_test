@@ -1,0 +1,2 @@
+C:/Users/BnpCo/Desktop/Planza/android/app/.cxx/Debug/de674m6e/armeabi-v7a/CMakeFiles/edit_cache.dir
+C:/Users/BnpCo/Desktop/Planza/android/app/.cxx/Debug/de674m6e/armeabi-v7a/CMakeFiles/rebuild_cache.dir

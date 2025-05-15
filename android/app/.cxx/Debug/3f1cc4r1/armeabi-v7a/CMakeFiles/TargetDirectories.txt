@@ -1,0 +1,2 @@
+C:/Users/BnpCo/Desktop/threads/android/app/.cxx/Debug/3f1cc4r1/armeabi-v7a/CMakeFiles/edit_cache.dir
+C:/Users/BnpCo/Desktop/threads/android/app/.cxx/Debug/3f1cc4r1/armeabi-v7a/CMakeFiles/rebuild_cache.dir
