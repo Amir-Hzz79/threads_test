@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:threads/features/new_post/pages/new_post_page.dart';
 
 import '../widgets/emoji_bubble.dart';
 import '../widgets/post_card.dart';
@@ -90,6 +91,16 @@ class HomePage extends StatelessWidget {
               ],
             ),
           ),
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(
+                builder: (context) => NewPostPage(),
+              ),
+            );
+          },
+          child: Icon(Icons.add_rounded),
         ),
       ),
     );

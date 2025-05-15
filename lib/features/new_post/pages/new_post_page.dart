@@ -6,6 +6,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:record/record.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:threads/core/models/post.dart';
+import 'package:threads/features/home/pages/home_page.dart';
 
 import '../../../core/widgets/video_player.dart';
 import '../../../core/widgets/voice_message_widget.dart';
@@ -134,7 +135,11 @@ class _NewPostPageState extends State<NewPostPage> {
             title: Text('ایجاد ادعای جدید'),
             actions: [
               IconButton(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.of(context).pushReplacement(MaterialPageRoute(
+                    builder: (context) => HomePage(),
+                  ));
+                },
                 icon: Icon(Icons.close_rounded),
               ),
             ],
@@ -147,13 +152,13 @@ class _NewPostPageState extends State<NewPostPage> {
                 children: [
                   ListTile(
                     leading: CircleAvatar(
-                      backgroundImage: AssetImage('assets/images/profile.JPEG'),
+                      backgroundImage: AssetImage('assets/images/pfp.png'),
                     ),
                     title: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
-                          'Amir_Hzz79',
+                          'Mahtaab',
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                         const SizedBox(
