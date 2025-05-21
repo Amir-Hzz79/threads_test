@@ -4,9 +4,10 @@ import 'package:video_player/video_player.dart';
 
 class VideoPreviewPlayer extends StatefulWidget {
   final File videoFile;
+  final double maxHeight;
 
-  const VideoPreviewPlayer({Key? key, required this.videoFile})
-      : super(key: key);
+  const VideoPreviewPlayer(
+      {super.key, required this.videoFile, required this.maxHeight});
 
   @override
   State<VideoPreviewPlayer> createState() => _VideoPreviewPlayerState();
@@ -51,37 +52,33 @@ class _VideoPreviewPlayerState extends State<VideoPreviewPlayer> {
   @override
   Widget build(BuildContext context) {
     return _controller.value.isInitialized
-        ? LayoutBuilder(builder: (context, constrants) {
-            final aspectratio = _controller.value.aspectRatio;
-            final width = MediaQuery.of(context).size.width;
-            final height = width / (aspectratio - 1);
-            print(aspectratio);
-            print(width);
-            print(height);
+        ? LayoutBuilder(builder: (context, constraints) {
+            final aspectRatio = _controller.value.aspectRatio;
+            final availableWidth = constraints.maxWidth;
+
+            // Calculate the ideal height based on the full width and aspect ratio
+            final idealHeight = availableWidth / aspectRatio;
+
+            // Determine the actual height to use, respecting the maxHeight
+            final actualHeight =
+                idealHeight > widget.maxHeight ? widget.maxHeight : idealHeight;
+
             return Stack(
               alignment: Alignment.center,
               children: [
                 SizedBox(
-                  width: width,
-                  height: height,
-                  child: VideoPlayer(_controller),
-                ),
-                /* Positioned(
-                  top: 0,
-                  right: 0,
-                  child: IconButton(
-                    icon: Icon(
-                      Icons.close_rounded,
-                      size: 30,
-                      color: Colors.black,
+                  width: availableWidth,
+                  height: actualHeight,
+                  child: FittedBox(
+                    fit: BoxFit.contain, // Or other BoxFit options as needed
+                    child: SizedBox(
+                      width: availableWidth, // Intrinsic width (will be scaled)
+                      height:
+                          idealHeight, // Intrinsic height based on full width
+                      child: VideoPlayer(_controller),
                     ),
-                    onPressed: () {
-                      setState(() {
-                        
-                      });
-                    },
                   ),
-                ), */
+                ),
                 IconButton(
                   icon: Icon(
                     _isPlaying
@@ -95,7 +92,6 @@ class _VideoPreviewPlayerState extends State<VideoPreviewPlayer> {
               ],
             );
           })
-        : Center(
-            child: CircularProgressIndicator());
+        : const Center(child: CircularProgressIndicator());
   }
 }

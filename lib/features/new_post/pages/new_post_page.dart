@@ -5,11 +5,11 @@ import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:record/record.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:threads/core/models/post.dart';
-import 'package:threads/features/home/pages/home_page.dart';
 
 import '../../../core/widgets/video_player.dart';
-import '../../../core/widgets/voice_message_widget.dart';
+import '../../../core/widgets/voice_player.dart';
+import 'image_editor_page.dart';
+import 'video_editor_page.dart';
 
 class NewPostPage extends StatefulWidget {
   const NewPostPage({Key? key}) : super(key: key);
@@ -100,22 +100,6 @@ class _NewPostPageState extends State<NewPostPage> {
     }
   }
 
-  void _submit() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('پست با موفقیت منتشر شد'),
-      ),
-    );
-
-    final Post post = Post(
-      selectedVideo: _selectedVideo,
-      selectedImage: _selectedImage,
-      recordedAudio: _recordedAudio,
-    );
-
-    //TODO: Implement
-  }
-
   @override
   void dispose() {
     _player.dispose();
@@ -131,25 +115,39 @@ class _NewPostPageState extends State<NewPostPage> {
       child: Directionality(
         textDirection: TextDirection.rtl,
         child: Scaffold(
-          appBar: AppBar(
+          /* appBar: AppBar(
             title: Text('ایجاد ادعای جدید'),
             actions: [
               IconButton(
-                onPressed: () {
-                  Navigator.of(context).pushReplacement(MaterialPageRoute(
-                    builder: (context) => HomePage(),
-                  ));
-                },
+                onPressed: () {},
                 icon: Icon(Icons.close_rounded),
               ),
             ],
-          ),
+          ), */
           body: Padding(
             padding: const EdgeInsets.symmetric(vertical: 16),
             child: SingleChildScrollView(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'ایجاد ادعای جدید',
+                          style: Theme.of(context).textTheme.titleLarge,
+                        ),
+                        IconButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                          icon: Icon(Icons.close_rounded),
+                        )
+                      ],
+                    ),
+                  ),
                   ListTile(
                     leading: CircleAvatar(
                       backgroundImage: AssetImage('assets/images/pfp.png'),
@@ -227,6 +225,7 @@ class _NewPostPageState extends State<NewPostPage> {
                   if (_selectedVideo != null)
                     VideoPreviewPlayer(
                       videoFile: _selectedVideo!,
+                      maxHeight: double.infinity,
                     ),
                   if (_selectedImage != null)
                     Image.file(
@@ -278,7 +277,33 @@ class _NewPostPageState extends State<NewPostPage> {
                       ),
                     ),
                     FilledButton(
-                      onPressed: _submit,
+                      onPressed: () {
+                        if (_selectedImage == null &&
+                            _selectedVideo == null &&
+                            _recordedAudio == null) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('محتوای ادعا را اضافه کنید'),
+                            ),
+                          );
+
+                          return;
+                        }
+
+                        if (_selectedImage != null || _selectedVideo != null) {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => _selectedImage != null
+                                  ? ImageEditorPage(
+                                      image: _selectedImage!,
+                                    )
+                                  : VideoEditorPage(
+                                      video: _selectedVideo!,
+                                    ),
+                            ),
+                          );
+                        }
+                      },
                       style: FilledButton.styleFrom(
                         foregroundColor: Colors.white,
                         backgroundColor: Colors.black,

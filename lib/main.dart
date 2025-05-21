@@ -15,7 +15,8 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       home: MaterialApp(
         title: 'Threads',
-        theme: ThemeData(
+        theme: ThemeData
+            .dark() /* ThemeData(
           useMaterial3: true,
           fontFamily: 'Shabnam',
           colorScheme: ColorScheme(
@@ -48,7 +49,8 @@ class MyApp extends StatelessWidget {
             scrim: Colors.black54,
             surfaceTint: Color(0xFF90CAF9),
           ),
-        ),
+        ) */
+        ,
         debugShowCheckedModeBanner: false,
         home: HomePage(),
       ),

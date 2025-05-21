@@ -1,0 +1,2 @@
+C:/Users/AmirPC/Desktop/New folder/threads/android/app/.cxx/RelWithDebInfo/52p1p616/arm64-v8a/CMakeFiles/edit_cache.dir
+C:/Users/AmirPC/Desktop/New folder/threads/android/app/.cxx/RelWithDebInfo/52p1p616/arm64-v8a/CMakeFiles/rebuild_cache.dir
