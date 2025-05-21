@@ -115,6 +115,7 @@ class _NewPostPageState extends State<NewPostPage> {
       child: Directionality(
         textDirection: TextDirection.rtl,
         child: Scaffold(
+          backgroundColor: Colors.black,
           /* appBar: AppBar(
             title: Text('ایجاد ادعای جدید'),
             actions: [
@@ -257,7 +258,7 @@ class _NewPostPageState extends State<NewPostPage> {
             width: screenSize.width,
             child: Container(
               width: screenSize.width - 30,
-              color: Theme.of(context).colorScheme.surface,
+              color: Colors.black,
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 10),
                 child: Row(
@@ -270,7 +271,7 @@ class _NewPostPageState extends State<NewPostPage> {
                           hintText:
                               'هر کسی میتواند ادعای شما رو ببیند و شما رو دوئل دعوت کند.',
                           hintStyle:
-                              TextStyle(fontSize: 11, color: Colors.grey),
+                              TextStyle(fontSize: 11, color: Colors.grey[300]),
                           border: InputBorder.none,
                         ),
                         textAlign: TextAlign.right,
@@ -309,6 +310,10 @@ class _NewPostPageState extends State<NewPostPage> {
                         backgroundColor: Colors.black,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
+                          side: BorderSide(
+                            width: 1,
+                            color: Colors.white38,
+                          ),
                         ),
                       ),
                       child: Text(

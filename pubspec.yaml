@@ -23,6 +23,8 @@ dependencies:
   audio_waveforms: ^1.3.0
   image_cropper: ^9.1.0
   video_editor: ^3.0.0
+  google_fonts: ^6.2.1
+  visibility_detector: ^0.4.0+2
   
 dev_dependencies:
   flutter_test:
