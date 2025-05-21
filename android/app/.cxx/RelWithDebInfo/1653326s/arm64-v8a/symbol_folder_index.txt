@@ -1,1 +1,0 @@
-C:\Users\BnpCo\Desktop\threads\build\app\intermediates\cxx\RelWithDebInfo\1653326s\obj\arm64-v8a

@@ -15,14 +15,14 @@ android {
     }
 
     kotlinOptions {
-        jvmTarget = "11"
+        jvmTarget = JavaVersion.VERSION_11.toString()
     }
 
     defaultConfig {
         applicationId = "com.amirhosseinzamani.threads"
-        ndk {
+        /* ndk {
             abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86_64'
-        }
+        } */
         minSdk = 25
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode

@@ -1,2 +1,0 @@
-C:/Users/BnpCo/Desktop/Planza/android/app/.cxx/Debug/de674m6e/x86_64/CMakeFiles/edit_cache.dir
-C:/Users/BnpCo/Desktop/Planza/android/app/.cxx/Debug/de674m6e/x86_64/CMakeFiles/rebuild_cache.dir
