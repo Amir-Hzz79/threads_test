@@ -5,13 +5,17 @@ import 'package:image_cropper/image_cropper.dart';
 
 import '../../../core/models/my_aspect_ratio.dart';
 
-import '../../home/pages/home_page.dart';
 import '../widgets/aspect_ratio_container.dart';
 
 class ImageEditorPage extends StatefulWidget {
-  const ImageEditorPage({super.key, required this.image});
+  const ImageEditorPage({
+    super.key,
+    required this.image,
+    required this.onImageEdited,
+  });
 
   final File image;
+  final Function(File image) onImageEdited;
 
   @override
   State<ImageEditorPage> createState() => _ImageEditorPageState();
@@ -71,16 +75,9 @@ class _ImageEditorPageState extends State<ImageEditorPage> {
   }
 
   void _exportImage() async {
-    print('image: ${image.path}');
-    //TODO: Send image as a new post to Home page
+    widget.onImageEdited(image);
 
     Navigator.of(context).pop();
-    Navigator.of(context).pop();
-    /*  Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => HomePage(),
-      ),
-    ); */
   }
 
   @override

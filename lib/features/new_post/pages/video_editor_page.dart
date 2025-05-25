@@ -1,20 +1,27 @@
 import 'dart:io';
 
+import 'package:ffmpeg_kit_flutter_new/ffmpeg_kit.dart';
 import 'package:flutter/material.dart';
-import 'package:threads/features/home/pages/home_page.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:threads/features/new_post/pages/crop_video_page.dart';
 import 'package:video_editor/video_editor.dart';
 import 'package:video_player/video_player.dart';
 
 import '../../../core/models/my_aspect_ratio.dart';
 
+import '../../../core/services/export_service.dart';
 import '../widgets/aspect_ratio_container.dart';
 import '../widgets/my_crop_grid_view.dart';
 
 class VideoEditorPage extends StatefulWidget {
-  const VideoEditorPage({super.key, required this.video});
+  const VideoEditorPage({
+    super.key,
+    required this.video,
+    required this.onVideoEdited,
+  });
 
   final File video;
+  final Function(File video) onVideoEdited;
 
   @override
   State<VideoEditorPage> createState() => _VideoEditorPageState();
@@ -72,15 +79,56 @@ class _VideoEditorPageState extends State<VideoEditorPage> {
     super.dispose();
   }
 
-  void _exportVideo() {
-    //TODO: Implement sending video to home page as a new post
-    /* Navigator.of(context).pushReplacement(
-      MaterialPageRoute(
-        builder: (context) => HomePage(),
+  Future<File?> applyCropVideo(
+      File inputVideo, double width, double height, double x, double y) async {
+    final directory = await getTemporaryDirectory();
+    final outputPath = '${directory.path}/cropped_video.mp4';
+
+    // FFmpeg crop command
+    String command =
+        '-i ${inputVideo.path} -vf "crop=${width.toInt()}:${height.toInt()}:${x.toInt()}:${y.toInt()}" -c:a copy $outputPath';
+
+    await FFmpegKit.execute(command).then((session) async {
+      final returnCode = await session.getReturnCode();
+      final failStackTrace = await session.getFailStackTrace();
+      print('returnCode: $returnCode');
+      print('Fail stack trace: $failStackTrace');
+
+      if (returnCode != null && returnCode.isValueSuccess()) {
+        print("Video successfully cropped!");
+        return File(outputPath);
+      } else {
+        print("FFmpeg failed! Stack trace: $failStackTrace");
+        return null;
+      }
+    });
+
+    return null;
+  }
+
+  void _exportVideo() async {
+    final config = VideoFFmpegVideoEditorConfig(_videoEditController);
+
+    await ExportService.runFFmpegCommand(
+      await config.getExecuteConfig(),
+      onProgress: (stats) {
+        _exportingProgress.value =
+            config.getFFmpegProgress(stats.getTime().toInt());
+      },
+      onError: (e, s) => ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('خطایی رخ داد'),
+        ),
       ),
-    ); */
-    Navigator.of(context).pop();
-    Navigator.of(context).pop();
+      onCompleted: (file) {
+        _isExporting.value = false;
+        if (!mounted) return;
+
+        widget.onVideoEdited(file);
+
+        Navigator.of(context).pop();
+      },
+    );
   }
 
   MyAspectRatio? selectedAspecRatio;
@@ -93,6 +141,8 @@ class _VideoEditorPageState extends State<VideoEditorPage> {
         builder: (context) => CropVideoPage(
           controller: _videoEditController,
           onDone: () {
+            print(_videoEditController.cacheMaxCrop);
+            print(_videoEditController.cacheMinCrop);
             _videoEditController.applyCacheCrop();
 
             setState(() {

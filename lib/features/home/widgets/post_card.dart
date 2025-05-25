@@ -1,32 +1,24 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:threads/core/extentions/date_time_extentions.dart';
+import 'package:threads/core/widgets/voice_player.dart';
+import 'package:threads/features/home/pages/home_page.dart';
 import 'package:video_player/video_player.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
+import '../../../core/models/post.dart';
+import '../../new_post/pages/edit_post_page.dart';
+
 class PostCards extends StatefulWidget {
-  final String username;
-  final String time;
-  final String profilePicUrl;
-  final bool mypost;
-
-  final String? postText;
-  final String? imageUrl;
-  final String? voiceLabel;
-  final String? videoUrl;
-
-  final List<Widget> emojis;
+  final Post post;
+  final bool editable;
 
   const PostCards({
     super.key,
-    required this.username,
-    required this.time,
-    required this.profilePicUrl,
-    required this.mypost,
-    this.postText,
-    this.imageUrl,
-    this.voiceLabel,
-    this.videoUrl,
-    this.emojis = const [],
+    required this.post,
+    required this.editable,
   });
 
   @override
@@ -43,9 +35,8 @@ class _PostCardsState extends State<PostCards> {
   @override
   void initState() {
     super.initState();
-    if (widget.videoUrl != null) {
-      _videoController =
-      VideoPlayerController.networkUrl(Uri.parse(widget.videoUrl!))
+    if (widget.post.video != null) {
+      _videoController = VideoPlayerController.file(widget.post.video!)
         ..initialize().then((_) {
           setState(() {});
         })
@@ -90,15 +81,15 @@ class _PostCardsState extends State<PostCards> {
           .push(
         MaterialPageRoute(
           builder: (context) => FullScreenVideoPage(
-            videoUrl: widget.videoUrl!,
+            video: widget.post.video!,
             initialPosition: currentPosition,
           ),
         ),
       )
           .then((_) {
         if (mounted) {
-          _videoController!.seekTo(
-              FullScreenVideoPage.currentPosition ?? Duration.zero);
+          _videoController!
+              .seekTo(FullScreenVideoPage.currentPosition ?? Duration.zero);
           _videoController!.play();
         }
       });
@@ -108,7 +99,12 @@ class _PostCardsState extends State<PostCards> {
   @override
   Widget build(BuildContext context) {
     return VisibilityDetector(
-      key: Key(widget.videoUrl ?? widget.imageUrl ?? widget.postText ?? "post"),
+      key: Key(
+        widget.post.video?.path ??
+            widget.post.image?.path ??
+            widget.post.text ??
+            "post",
+      ),
       onVisibilityChanged: (info) {
         if (_videoController != null) {
           if (info.visibleFraction > 0.5) {
@@ -128,7 +124,7 @@ class _PostCardsState extends State<PostCards> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 CircleAvatar(
-                  backgroundImage: NetworkImage(widget.profilePicUrl),
+                  backgroundImage: NetworkImage(widget.post.user.profilePicUrl),
                   radius: 25,
                 ),
                 const SizedBox(width: 16),
@@ -138,23 +134,24 @@ class _PostCardsState extends State<PostCards> {
                     children: [
                       Row(
                         children: [
-                          Text(widget.username,
+                          Text(widget.post.user.username,
                               style: const TextStyle(
-                                  color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
-
+                                  color: Colors.white,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold)),
                           SizedBox(
                             width: 10,
                           ),
-
-                          Text(widget.time,
-                              style: TextStyle(
-                                  color: Colors.white.withOpacity(0.6),
-                                  fontSize: 14)),
+                          Text(
+                            widget.post.createdAt.toTimeOnly(),
+                            style: TextStyle(
+                              color: Colors.white.withOpacity(0.6),
+                              fontSize: 14,
+                            ),
+                          ),
                         ],
                       ),
-
-
-                      if (widget.postText != null)
+                      if (widget.post.text != null)
                         GestureDetector(
                           onTap: () {
                             setState(() {
@@ -163,10 +160,12 @@ class _PostCardsState extends State<PostCards> {
                           },
                           child: RichText(
                             text: TextSpan(
-                              text: widget.postText!,
-                              style: const TextStyle(color: Colors.white, fontSize: 15),
+                              text: widget.post.text!,
+                              style: const TextStyle(
+                                  color: Colors.white, fontSize: 15),
                               children: [
-                                if (!isExpanded && widget.postText!.length > 100)
+                                if (!isExpanded &&
+                                    widget.post.text!.length > 100)
                                   const TextSpan(
                                       text: " more...",
                                       style: TextStyle(color: Colors.white60)),
@@ -177,10 +176,13 @@ class _PostCardsState extends State<PostCards> {
                               ],
                             ),
                             maxLines:
-                            isExpanded || widget.postText!.length <= 100 ? null : 2,
-                            overflow: isExpanded || widget.postText!.length <= 100
-                                ? TextOverflow.visible
-                                : TextOverflow.ellipsis,
+                                isExpanded || widget.post.text!.length <= 100
+                                    ? null
+                                    : 2,
+                            overflow:
+                                isExpanded || widget.post.text!.length <= 100
+                                    ? TextOverflow.visible
+                                    : TextOverflow.ellipsis,
                           ),
                         ),
                     ],
@@ -194,46 +196,27 @@ class _PostCardsState extends State<PostCards> {
               ],
             ),
             const SizedBox(height: 5),
-
-
-
-            if (widget.imageUrl != null) ...[
+            if (widget.post.image != null) ...[
               const SizedBox(height: 16),
               ClipRRect(
                 borderRadius: BorderRadius.circular(10),
-                child: Image.network(
-                  widget.imageUrl!,
-                  loadingBuilder: (context, child, progress) {
-                    if (progress == null) return child;
-                    return Center(
-                      child: CircularProgressIndicator(
-                        value: progress.expectedTotalBytes != null
-                            ? progress.cumulativeBytesLoaded /
-                            progress.expectedTotalBytes!
-                            : null,
-                      ),
-                    );
-                  },
-                  errorBuilder: (context, error, stackTrace) {
-                    return const Text('Failed to load image',
-                        style: TextStyle(color: Colors.white));
-                  },
-                ),
+                child: Image.file(widget.post.image!),
               ),
             ],
-
-            if (widget.voiceLabel != null) ...[
+            if (widget.post.audio != null) ...[
               const SizedBox(height: 16),
-              Row(
+              VoicePlayer(
+                audioFile: widget.post.audio!,
+              ),
+              /* Row(
                 children: [
                   Icon(Icons.voice_chat, color: Colors.white.withOpacity(0.6)),
                   const SizedBox(width: 8),
-                  Text(widget.voiceLabel!,
+                  Text('widget.voiceLabel!',
                       style: TextStyle(color: Colors.white.withOpacity(0.6))),
                 ],
-              ),
+              ), */
             ],
-
             if (_videoController != null &&
                 _videoController!.value.isInitialized) ...[
               const SizedBox(height: 16),
@@ -266,8 +249,7 @@ class _PostCardsState extends State<PostCards> {
                 ],
               ),
             ],
-
-            if (widget.emojis.isNotEmpty) ...[
+            if (widget.post.emojies.isNotEmpty) ...[
               const SizedBox(height: 23),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -306,17 +288,16 @@ class _PostCardsState extends State<PostCards> {
                           Container(
                             height: 32,
                             width: 150,
-
                             child: Stack(
                               children: [
                                 SingleChildScrollView(
                                   scrollDirection: Axis.horizontal,
                                   child: Row(
-                                    children: widget.emojis.map((emoji) {
+                                    children: widget.post.emojies.map((emoji) {
                                       return Padding(
                                         padding: const EdgeInsets.symmetric(
                                             horizontal: 4, vertical: 7),
-                                        child: emoji,
+                                        child: EmojiBubble(emoji: emoji),
                                       );
                                     }).toList(),
                                   ),
@@ -344,31 +325,37 @@ class _PostCardsState extends State<PostCards> {
                               ],
                             ),
                           ),
-
                         ],
                       ),
                     ],
                   ),
-                  widget.mypost
+                  widget.editable
                       ? InkWell(
-                    onTap: () {},
-                    child: Container(
-                      height: 30,
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.white10),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 5),
-                      child: Text("ویرایش ادعا",
-                          style: GoogleFonts.notoSansArabic(fontSize: 13, color: Colors.white)
-                    ),
-                  )
-                  ): const SizedBox.shrink(),
+                          onTap: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) => EditPostPage(
+                                  post: widget.post,
+                                ),
+                              ),
+                            );
+                          },
+                          child: Container(
+                            height: 30,
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.white10),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 10, vertical: 5),
+                            child: Text("ویرایش ادعا",
+                                style: GoogleFonts.notoSansArabic(
+                                    fontSize: 13, color: Colors.white)),
+                          ))
+                      : const SizedBox.shrink(),
                 ],
               ),
             ],
-
             const SizedBox(height: 12),
             Row(
               children: [
@@ -379,7 +366,6 @@ class _PostCardsState extends State<PostCards> {
                     color: _isLiked ? Colors.red : Colors.white,
                   ),
                 ),
-
               ],
             ),
           ],
@@ -390,19 +376,20 @@ class _PostCardsState extends State<PostCards> {
 }
 
 class FullScreenVideoPage extends StatelessWidget {
-  final String videoUrl;
+  final File video;
   final Duration initialPosition;
   static Duration? currentPosition;
 
   const FullScreenVideoPage({
     super.key,
-    required this.videoUrl,
+    required this.video,
     required this.initialPosition,
   });
 
   @override
   Widget build(BuildContext context) {
-    final controller = VideoPlayerController.networkUrl(Uri.parse(videoUrl));
+    final controller = VideoPlayerController.file(video);
+
     return Scaffold(
       backgroundColor: Colors.black,
       body: FutureBuilder(

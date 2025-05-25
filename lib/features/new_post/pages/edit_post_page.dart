@@ -3,22 +3,29 @@ import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:provider/provider.dart';
 import 'package:record/record.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:threads/core/models/post.dart';
 
+import '../../../core/data/fake_data.dart';
+import '../../../core/providers/post_provider.dart';
+import '../../../core/widgets/image_viewer.dart';
 import '../../../core/widgets/video_player.dart';
 import '../../../core/widgets/voice_player.dart';
 import 'image_editor_page.dart';
 import 'video_editor_page.dart';
 
-class NewPostPage extends StatefulWidget {
-  const NewPostPage({Key? key}) : super(key: key);
+class EditPostPage extends StatefulWidget {
+  const EditPostPage({Key? key, required this.post}) : super(key: key);
+
+  final Post post;
 
   @override
-  State<NewPostPage> createState() => _NewPostPageState();
+  State<EditPostPage> createState() => _EditPostPageState();
 }
 
-class _NewPostPageState extends State<NewPostPage> {
+class _EditPostPageState extends State<EditPostPage> {
   File? _selectedImage;
   File? _selectedVideo;
   File? _recordedAudio;
@@ -27,6 +34,17 @@ class _NewPostPageState extends State<NewPostPage> {
   final AudioPlayer _player = AudioPlayer();
   bool _isRecording = false;
   final RecorderController recorderController = RecorderController();
+  final TextEditingController _textController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+
+    _selectedImage = widget.post.image;
+    _selectedVideo = widget.post.video;
+    _recordedAudio = widget.post.audio;
+    _textController.text = widget.post.text ?? '';
+  }
 
   Future<void> _takePhoto() async {
     final XFile? image = await _picker.pickImage(source: ImageSource.camera);
@@ -40,39 +58,38 @@ class _NewPostPageState extends State<NewPostPage> {
   Future<void> _pickVideo() async {
     final XFile? video = await _picker.pickVideo(source: ImageSource.gallery);
     if (video != null) {
-      setState(() {
-        _selectedVideo = File(video.path);
-        _selectedImage = null;
-      });
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => VideoEditorPage(
+            video: File(video.path),
+            onVideoEdited: (video) {
+              setState(() {
+                _selectedVideo = video;
+                _selectedImage = null;
+              });
+            },
+          ),
+        ),
+      );
     }
   }
-
-  /* Future<void> _pickMedia() async {
-    final XFile? media = await _picker.pickMedia();
-    if (media == null) {
-      return;
-    }
-
-    if (media.mimeType!.startsWith('video')) {
-      setState(() {
-        _selectedVideo = File(media.path);
-        _selectedImage = null;
-      });
-    } else {
-      setState(() {
-        _selectedImage = File(media.path);
-        _selectedVideo = null;
-      });
-    }
-  } */
 
   Future<void> _pickImage() async {
     final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
     if (image != null) {
-      setState(() {
-        _selectedImage = File(image.path);
-        _selectedVideo = null;
-      });
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => ImageEditorPage(
+            image: File(image.path),
+            onImageEdited: (image) {
+              setState(() {
+                _selectedImage = image;
+                _selectedVideo = null;
+              });
+            },
+          ),
+        ),
+      );
     }
   }
 
@@ -93,6 +110,7 @@ class _NewPostPageState extends State<NewPostPage> {
           RecordConfig(encoder: AudioEncoder.aacLc),
           path: path,
         );
+
         setState(() {
           _isRecording = true;
         });
@@ -116,17 +134,8 @@ class _NewPostPageState extends State<NewPostPage> {
         textDirection: TextDirection.rtl,
         child: Scaffold(
           backgroundColor: Colors.black,
-          /* appBar: AppBar(
-            title: Text('ایجاد ادعای جدید'),
-            actions: [
-              IconButton(
-                onPressed: () {},
-                icon: Icon(Icons.close_rounded),
-              ),
-            ],
-          ), */
           body: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 16),
+            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 10),
             child: SingleChildScrollView(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -150,26 +159,24 @@ class _NewPostPageState extends State<NewPostPage> {
                     ),
                   ),
                   ListTile(
+                    contentPadding: EdgeInsets.all(10),
                     leading: CircleAvatar(
-                      backgroundImage: AssetImage('assets/images/pfp.png'),
+                      backgroundImage:
+                          NetworkImage(FakeData.currentUser.profilePicUrl),
                     ),
                     title: Row(
                       mainAxisSize: MainAxisSize.min,
+                      spacing: 5,
                       children: [
                         Text(
-                          'Mahtaab',
+                          FakeData.currentUser.username,
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
-                        const SizedBox(
-                          width: 5,
-                        ),
                         Icon(Icons.arrow_forward_ios_rounded, size: 12),
-                        const SizedBox(
-                          width: 5,
-                        ),
                         Expanded(
                           flex: 10,
                           child: TextField(
+                            controller: _textController,
                             decoration: InputDecoration(
                               hintText: 'افزودن موضوع',
                               hintStyle:
@@ -227,24 +234,44 @@ class _NewPostPageState extends State<NewPostPage> {
                     VideoPreviewPlayer(
                       videoFile: _selectedVideo!,
                       maxHeight: double.infinity,
+                      onClosePressed: () => setState(
+                        () {
+                          _selectedVideo = null;
+                        },
+                      ),
                     ),
                   if (_selectedImage != null)
-                    Image.file(
+                    ImageViewer(
+                      image: Image.file(
+                        _selectedImage!,
+                        width: screenSize.width,
+                      ),
+                      onClosePressed: () => setState(
+                        () {
+                          _selectedImage = null;
+                        },
+                      ),
+                    ),
+                  /* ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: Image.file(
                       _selectedImage!,
                       width: screenSize.width,
                     ),
-                  if (_recordedAudio != null)
-                    Container(
-                      color: Colors.black,
-                      width: double.infinity,
-                      padding: EdgeInsets.symmetric(vertical: 10),
-                      margin: EdgeInsets.symmetric(vertical: 20),
-                      child: Center(
-                        child: VoicePlayer(
-                          audioFile: _recordedAudio!,
+                  ), */
+                  if (_recordedAudio != null) ...[
+                    const SizedBox(height: 20),
+                    Center(
+                      child: VoicePlayer(
+                        audioFile: _recordedAudio!,
+                        onClosePressed: () => setState(
+                          () {
+                            _recordedAudio = null;
+                          },
                         ),
                       ),
                     ),
+                  ],
                   const SizedBox(
                     height: 100,
                   )
@@ -281,29 +308,34 @@ class _NewPostPageState extends State<NewPostPage> {
                       onPressed: () {
                         if (_selectedImage == null &&
                             _selectedVideo == null &&
-                            _recordedAudio == null) {
+                            _recordedAudio == null &&
+                            _textController.text.isEmpty) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                              content: Text('محتوای ادعا را اضافه کنید'),
+                              content: Text('محتوای ادعا را وارد کنید.'),
                             ),
                           );
-
                           return;
                         }
 
-                        if (_selectedImage != null || _selectedVideo != null) {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => _selectedImage != null
-                                  ? ImageEditorPage(
-                                      image: _selectedImage!,
-                                    )
-                                  : VideoEditorPage(
-                                      video: _selectedVideo!,
-                                    ),
-                            ),
-                          );
-                        }
+                        print('here1');
+                        print(
+                            '-------------------_textController.text:${_textController.text}');
+                        Provider.of<PostProvider>(context, listen: false)
+                            .updatePost(
+                          widget.post.id,
+                          Post.fromFile(
+                            image: _selectedImage,
+                            video: _selectedVideo,
+                            audio: _recordedAudio,
+                            text: _textController.text,
+                            user: FakeData.currentUser,
+                            createdAt: widget.post.createdAt,
+                          ),
+                        );
+                        print('here1-2');
+
+                        Navigator.of(context).pop();
                       },
                       style: FilledButton.styleFrom(
                         foregroundColor: Colors.white,

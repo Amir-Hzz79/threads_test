@@ -1,7 +1,7 @@
 name: threads
 description: "test"
 
-publish_to: 'none'
+publish_to: "none"
 
 version: 1.0.0+1
 
@@ -25,19 +25,21 @@ dependencies:
   video_editor: ^3.0.0
   google_fonts: ^6.2.1
   visibility_detector: ^0.4.0+2
-  
+  provider: ^6.1.5
+  ffmpeg_kit_flutter_new: ^1.6.1
+  #ffmpeg_kit_flutter_min: ^6.0.3
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
-
 
 flutter:
   uses-material-design: true
 
   assets:
-   - assets/fonts/
-   - assets/images/
-   - assets/audio/
+    - assets/fonts/
+    - assets/images/
+    - assets/audio/
   #  - assets/lang/
 fonts:
   - family: Shabnam

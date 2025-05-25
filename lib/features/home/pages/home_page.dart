@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
-import '../../new_post/pages/new_post_page.dart';
+import 'package:provider/provider.dart';
+import 'package:threads/core/data/fake_data.dart';
+import 'package:threads/core/providers/post_provider.dart';
+import 'package:threads/core/widgets/scrollable_column.dart';
+import '../../../core/models/post.dart';
 import '../widgets/post_card.dart';
 
 class HomePage extends StatelessWidget {
@@ -12,112 +16,39 @@ class HomePage extends StatelessWidget {
       title: 'Post Card Demo',
       theme: ThemeData.dark(),
       home: Scaffold(
-        backgroundColor: Colors.black,
+        backgroundColor: Colors.white10,
         body: SafeArea(
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                PostCards(
-                  username: 'Mahtaab',
-                  time: '17:07',
-                  postText:
-                      'This portfolio is a collection of my digital and conceptual artworks, showcasing a blend of imagination, cinematic atmospheres, and visual storytelling.',
-                  imageUrl:
-                      'https://a.storyblok.com/f/178900/800x420/d8889e2cbf/the-guy-she-was-interested-in-wasnt-a-guy-at-all.jpg', // Replace with a real URL
-                  profilePicUrl: 'https://i.redd.it/5pi46xym7d281.jpg',
-                  emojis: [
-                    EmojiBubble(emoji: '😊'),
-                    EmojiBubble(emoji: '😍'),
-                    EmojiBubble(emoji: '👍'),
-                    EmojiBubble(emoji: '😂'),
-                    EmojiBubble(emoji: '🌟'),
-                    EmojiBubble(emoji: '🔥'),
-                    EmojiBubble(emoji: '💬'),
-                  ],
-                  mypost: true,
-                ),
-                SizedBox(height: 10),
-                Container(
-                  width: double.infinity,
-                  height: 2,
-                  color: Colors.white10,
-                ),
-                SizedBox(height: 10),
-                PostCards(
-                  username: 'Mahtaab',
-                  time: '17:07',
-                  postText:
-                      'This is a text-only post, without any image or voice.',
-                  profilePicUrl: 'https://i.redd.it/5pi46xym7d281.jpg',
-                  emojis: [
-                    EmojiBubble(emoji: '😊'),
-                    EmojiBubble(emoji: '😍'),
-                    EmojiBubble(emoji: '👍'),
-                    EmojiBubble(emoji: '😂'),
-                    EmojiBubble(emoji: '🌟'),
-                    EmojiBubble(emoji: '🔥'),
-                    EmojiBubble(emoji: '💬'),
-                  ],
-                  mypost: false,
-                ),
-                SizedBox(height: 10),
-                Container(
-                  width: double.infinity,
-                  height: 2,
-                  color: Colors.white10,
-                ),
-                SizedBox(height: 10),
-                PostCards(
-                  username: 'Mahtaab',
-                  time: '17:07',
-                  postText: 'This should be a post with voice',
-                  profilePicUrl: 'https://i.redd.it/5pi46xym7d281.jpg',
-                  emojis: [
-                    EmojiBubble(emoji: '😊'),
-                    EmojiBubble(emoji: '😍'),
-                    EmojiBubble(emoji: '👍'),
-                    EmojiBubble(emoji: '😂'),
-                    EmojiBubble(emoji: '🌟'),
-                    EmojiBubble(emoji: '🔥'),
-                    EmojiBubble(emoji: '💬'),
-                  ],
-                  mypost: false,
-                ),
-                Container(
-                  width: double.infinity,
-                  height: 2,
-                  color: Colors.white10,
-                ),
-                SizedBox(height: 10),
-                PostCards(
-                  username: 'Mahtaab',
-                  time: '17:10',
-                  postText: 'I WILL TATTOO THIS CLIP!',
-                  videoUrl:
-                      'https://flutter.github.io/assets-for-api-docs/assets/videos/bee.mp4', // Replace with a real URL
-                  profilePicUrl: 'https://i.redd.it/5pi46xym7d281.jpg',
-                  emojis: [
-                    EmojiBubble(emoji: '😊'),
-                    EmojiBubble(emoji: '😍'),
-                    EmojiBubble(emoji: '👍'),
-                    EmojiBubble(emoji: '😂'),
-                    EmojiBubble(emoji: '🌟'),
-                    EmojiBubble(emoji: '🔥'),
-                    EmojiBubble(emoji: '💬'),
-                  ],
-                  mypost: false,
-                ),
-              ],
+          child: Consumer<PostProvider>(
+            builder: (context, postProvider, child) => ScrollableColumn(
+              spacing: 2,
+              children: List.generate(
+                postProvider.posts.length,
+                (index) => FutureBuilder(
+                    future: postProvider.posts[index],
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return SizedBox(
+                          width: double.infinity,
+                          height: 250,
+                          child: Center(child: CircularProgressIndicator()),
+                        );
+                      }
+
+                      Post post = snapshot.data ??
+                          Post.fromUrl(
+                            user: FakeData.currentUser,
+                            text: 'error',
+                            createdAt: DateTime.now(),
+                          ) as Post;
+
+                      return PostCards(
+                        post: post,
+                        editable: true,
+                      );
+                    }),
+              ),
             ),
           ),
-        ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () => Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) => NewPostPage(),
-            ),
-          ),
-          child: Icon(Icons.add_rounded),
         ),
       ),
     );
