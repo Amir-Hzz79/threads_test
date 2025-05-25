@@ -18,15 +18,16 @@ class ImageViewer extends StatelessWidget {
           borderRadius: BorderRadius.circular(10),
           child: image,
         ),
-        IconButton(
-          style: IconButton.styleFrom(backgroundColor: Colors.black45),
-          onPressed: onClosePressed,
-          icon: Icon(
-            Icons.close_rounded,
-            color: Colors.white70,
-            size: 20,
+        if (onClosePressed != null)
+          IconButton(
+            style: IconButton.styleFrom(backgroundColor: Colors.black45),
+            onPressed: onClosePressed,
+            icon: Icon(
+              Icons.close_rounded,
+              color: Colors.white70,
+              size: 20,
+            ),
           ),
-        ),
       ],
     );
   }

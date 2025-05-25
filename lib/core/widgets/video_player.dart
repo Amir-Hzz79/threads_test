@@ -98,20 +98,21 @@ class _VideoPreviewPlayerState extends State<VideoPreviewPlayer> {
                     ),
                     onPressed: _togglePlayPause,
                   ),
-                  Positioned(
-                    top: 0,
-                    right: 0,
-                    child: IconButton(
-                      style:
-                          IconButton.styleFrom(backgroundColor: Colors.black45),
-                      onPressed: widget.onClosePressed,
-                      icon: Icon(
-                        Icons.close_rounded,
-                        color: Colors.white70,
-                        size: 20,
+                  if (widget.onClosePressed != null)
+                    Positioned(
+                      top: 0,
+                      right: 0,
+                      child: IconButton(
+                        style: IconButton.styleFrom(
+                            backgroundColor: Colors.black45),
+                        onPressed: widget.onClosePressed,
+                        icon: Icon(
+                          Icons.close_rounded,
+                          color: Colors.white70,
+                          size: 20,
+                        ),
                       ),
                     ),
-                  ),
                 ],
               );
             }),
