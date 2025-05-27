@@ -48,7 +48,7 @@ class _VideoEditorPageState extends State<VideoEditorPage> {
     _videoEditController = VideoEditorController.file(
       widget.video,
       minDuration: const Duration(seconds: 1),
-      maxDuration: const Duration(seconds: 10),
+      maxDuration: const Duration(seconds: 100),
     );
 
     videoPlayerController = VideoPlayerController.file(widget.video);
@@ -109,18 +109,48 @@ class _VideoEditorPageState extends State<VideoEditorPage> {
   void _exportVideo() async {
     final config = VideoFFmpegVideoEditorConfig(_videoEditController);
 
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Wrap(
+          children: [
+            Text(
+                'در حال تغییر سایز ویدیو. ${_videoEditController.videoDuration.inSeconds > 20 ? 'ممکن است کمی زمان ببرد' : ''}...'),
+          ],
+        ),
+        duration: Duration(seconds: 1000),
+      ),
+    );
+
     await ExportService.runFFmpegCommand(
       await config.getExecuteConfig(),
       onProgress: (stats) {
         _exportingProgress.value =
             config.getFFmpegProgress(stats.getTime().toInt());
       },
-      onError: (e, s) => ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('خطایی رخ داد'),
-        ),
-      ),
+      onError: (e, s) {
+        ScaffoldMessenger.of(context).hideCurrentSnackBar();
+        Navigator.of(context).push(
+          ModalBottomSheetRoute(
+            enableDrag: true,
+            showDragHandle: true,
+            builder: (context) => SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(10),
+                child: Text('error:\n${e.toString()} \n\n stacktrace:\n$s'),
+              ),
+            ),
+            isScrollControlled: true,
+          ),
+        );
+        /* ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('error:\n${e.toString()} \n\n stacktrace:\n$s'),
+            duration: Duration(seconds: 5),
+          ),
+        ); */
+      },
       onCompleted: (file) {
+        ScaffoldMessenger.of(context).hideCurrentSnackBar();
         _isExporting.value = false;
         if (!mounted) return;
 

@@ -5,8 +5,15 @@ import 'package:audio_waveforms/audio_waveforms.dart';
 class VoicePlayer extends StatefulWidget {
   final File audioFile;
   final void Function()? onClosePressed;
+  final double width;
+  final double height;
 
-  const VoicePlayer({super.key, required this.audioFile, this.onClosePressed});
+  const VoicePlayer(
+      {super.key,
+      required this.audioFile,
+      this.onClosePressed,
+      required this.width,
+      required this.height});
 
   @override
   _VoicePlayerState createState() => _VoicePlayerState();
@@ -52,30 +59,26 @@ class _VoicePlayerState extends State<VoicePlayer> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(vertical: 10, horizontal: 5),
+      padding: EdgeInsets.only(right: 8),
       decoration: BoxDecoration(
-        color: const Color(0xFF181818),
-        borderRadius: BorderRadius.circular(10),
+        color: Theme.of(context).colorScheme.primary,
+        borderRadius: BorderRadius.circular(25),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           if (widget.onClosePressed != null)
             IconButton(
-              style: IconButton.styleFrom(backgroundColor: Colors.black45),
               onPressed: widget.onClosePressed,
               icon: Icon(
                 Icons.close_rounded,
-                color: Colors.white70,
-                size: 20,
+                color: Colors.white,
+                size: 25,
               ),
             ),
           AudioFileWaveforms(
             playerController: _playerController,
-            size: Size(
-                MediaQuery.of(context).size.width -
-                    (widget.onClosePressed == null ? 80 : 130),
-                50),
+            size: Size(widget.width, widget.height),
             waveformType: WaveformType.fitWidth,
             playerWaveStyle: PlayerWaveStyle(
               seekLineThickness: 3,
@@ -89,8 +92,10 @@ class _VoicePlayerState extends State<VoicePlayer> {
           IconButton(
             icon: Icon(
               _playerController.playerState == PlayerState.playing
-                  ? Icons.pause
-                  : Icons.play_arrow,
+                  ? Icons.pause_circle_filled_rounded
+                  : Icons.play_circle_fill_rounded,
+              color: Colors.white,
+              size: 40,
             ),
             onPressed: _togglePlayback,
           ),

@@ -98,277 +98,286 @@ class _PostCardsState extends State<PostCards> {
 
   @override
   Widget build(BuildContext context) {
-    return VisibilityDetector(
-      key: Key(
-        widget.post.video?.path ??
-            widget.post.image?.path ??
-            widget.post.text ??
-            "post",
-      ),
-      onVisibilityChanged: (info) {
-        if (_videoController != null) {
-          if (info.visibleFraction > 0.5) {
-            _videoController!.play();
-          } else {
-            _videoController!.pause();
+    return Directionality(
+      textDirection: TextDirection.rtl,
+      child: VisibilityDetector(
+        key: Key(
+          widget.post.video?.path ??
+              widget.post.image?.path ??
+              widget.post.text ??
+              "post",
+        ),
+        onVisibilityChanged: (info) {
+          if (_videoController != null) {
+            if (info.visibleFraction > 0.5) {
+              _videoController!.play();
+            } else {
+              _videoController!.pause();
+            }
           }
-        }
-      },
-      child: Container(
-        color: Colors.black,
-        padding: const EdgeInsets.all(10),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                CircleAvatar(
-                  backgroundImage: NetworkImage(widget.post.user.profilePicUrl),
-                  radius: 25,
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Text(widget.post.user.username,
-                              style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold)),
-                          SizedBox(
-                            width: 10,
-                          ),
-                          Text(
-                            widget.post.createdAt.toTimeOnly(),
-                            style: TextStyle(
-                              color: Colors.white.withOpacity(0.6),
-                              fontSize: 14,
-                            ),
-                          ),
-                        ],
-                      ),
-                      if (widget.post.text != null)
-                        GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              isExpanded = !isExpanded;
-                            });
-                          },
-                          child: RichText(
-                            text: TextSpan(
-                              text: widget.post.text!,
-                              style: const TextStyle(
-                                  color: Colors.white, fontSize: 15),
-                              children: [
-                                if (!isExpanded &&
-                                    widget.post.text!.length > 100)
-                                  const TextSpan(
-                                      text: " more...",
-                                      style: TextStyle(color: Colors.white60)),
-                                if (isExpanded)
-                                  const TextSpan(
-                                      text: " less",
-                                      style: TextStyle(color: Colors.white38)),
-                              ],
-                            ),
-                            maxLines:
-                                isExpanded || widget.post.text!.length <= 100
-                                    ? null
-                                    : 2,
-                            overflow:
-                                isExpanded || widget.post.text!.length <= 100
-                                    ? TextOverflow.visible
-                                    : TextOverflow.ellipsis,
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
-                IconButton(
-                  onPressed: () {},
-                  icon: Icon(Icons.more_horiz,
-                      color: Colors.white.withOpacity(0.6)),
-                ),
-              ],
-            ),
-            const SizedBox(height: 5),
-            if (widget.post.image != null) ...[
-              const SizedBox(height: 16),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(10),
-                child: Image.file(widget.post.image!),
-              ),
-            ],
-            if (widget.post.audio != null) ...[
-              const SizedBox(height: 16),
-              VoicePlayer(
-                audioFile: widget.post.audio!,
-              ),
-              /* Row(
-                children: [
-                  Icon(Icons.voice_chat, color: Colors.white.withOpacity(0.6)),
-                  const SizedBox(width: 8),
-                  Text('widget.voiceLabel!',
-                      style: TextStyle(color: Colors.white.withOpacity(0.6))),
-                ],
-              ), */
-            ],
-            if (_videoController != null &&
-                _videoController!.value.isInitialized) ...[
-              const SizedBox(height: 16),
-              Stack(
-                children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
-                    child: GestureDetector(
-                      onTap: _toggleFullScreen,
-                      child: AspectRatio(
-                        aspectRatio: _videoController!.value.aspectRatio,
-                        child: VideoPlayer(_videoController!),
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    bottom: 16,
-                    right: 16,
-                    child: GestureDetector(
-                      onTap: _toggleSound,
-                      child: CircleAvatar(
-                        backgroundColor: Colors.black.withOpacity(0.6),
-                        child: Icon(
-                          _isMuted ? Icons.volume_off : Icons.volume_up,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-            if (widget.post.emojies.isNotEmpty) ...[
-              const SizedBox(height: 23),
+        },
+        child: Container(
+          color: Colors.black,
+          padding: const EdgeInsets.all(10),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Stack(
-                    children: [
-                      Container(
-                        height: 30,
-                        width: 170,
-                        decoration: BoxDecoration(
-                          color: Colors.black,
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: Colors.white12),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.2),
-                              spreadRadius: 1,
-                              blurRadius: 6,
+                  CircleAvatar(
+                    backgroundImage:
+                        NetworkImage(widget.post.user.profilePicUrl),
+                    radius: 25,
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Text(widget.post.user.username,
+                                style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold)),
+                            SizedBox(
+                              width: 10,
+                            ),
+                            Text(
+                              widget.post.createdAt.toTimeOnly(),
+                              style: TextStyle(
+                                color: Colors.white.withOpacity(0.6),
+                                fontSize: 14,
+                              ),
                             ),
                           ],
                         ),
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Container(
-                            height: 30,
-                            width: 30,
-                            decoration: BoxDecoration(
-                              border: Border.all(color: Colors.white30),
-                              borderRadius: BorderRadius.circular(10),
+                        if (widget.post.text != null)
+                          GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                isExpanded = !isExpanded;
+                              });
+                            },
+                            child: RichText(
+                              text: TextSpan(
+                                text: widget.post.text!,
+                                style: const TextStyle(
+                                    color: Colors.white, fontSize: 15),
+                                children: [
+                                  if (!isExpanded &&
+                                      widget.post.text!.length > 100)
+                                    const TextSpan(
+                                        text: " more...",
+                                        style:
+                                            TextStyle(color: Colors.white60)),
+                                  if (isExpanded)
+                                    const TextSpan(
+                                        text: " less",
+                                        style:
+                                            TextStyle(color: Colors.white38)),
+                                ],
+                              ),
+                              maxLines:
+                                  isExpanded || widget.post.text!.length <= 100
+                                      ? null
+                                      : 2,
+                              overflow:
+                                  isExpanded || widget.post.text!.length <= 100
+                                      ? TextOverflow.visible
+                                      : TextOverflow.ellipsis,
                             ),
-                            child: const Icon(Icons.open_in_full_outlined,
-                                color: Colors.white, size: 15),
                           ),
-                          Container(
-                            height: 32,
-                            width: 150,
-                            child: Stack(
-                              children: [
-                                SingleChildScrollView(
-                                  scrollDirection: Axis.horizontal,
-                                  child: Row(
-                                    children: widget.post.emojies.map((emoji) {
-                                      return Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 4, vertical: 7),
-                                        child: EmojiBubble(emoji: emoji),
-                                      );
-                                    }).toList(),
+                      ],
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () {},
+                    icon: Icon(Icons.more_horiz,
+                        color: Colors.white.withOpacity(0.6)),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 5),
+              if (widget.post.image != null) ...[
+                const SizedBox(height: 16),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: Image.file(widget.post.image!),
+                ),
+              ],
+              if (_videoController != null &&
+                  _videoController!.value.isInitialized) ...[
+                const SizedBox(height: 16),
+                Stack(
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: GestureDetector(
+                        onTap: _toggleFullScreen,
+                        child: AspectRatio(
+                          aspectRatio: _videoController!.value.aspectRatio,
+                          child: VideoPlayer(_videoController!),
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      bottom: 16,
+                      right: 16,
+                      child: GestureDetector(
+                        onTap: _toggleSound,
+                        child: CircleAvatar(
+                          backgroundColor: Colors.black.withOpacity(0.6),
+                          child: Icon(
+                            _isMuted ? Icons.volume_off : Icons.volume_up,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+              if (widget.post.audio != null) ...[
+                const SizedBox(height: 16),
+                VoicePlayer(
+                  audioFile: widget.post.audio!,
+                  width: MediaQuery.of(context).size.width / 2,
+                  height: 30,
+                ),
+                /* Row(
+                  children: [
+                    Icon(Icons.voice_chat, color: Colors.white.withOpacity(0.6)),
+                    const SizedBox(width: 8),
+                    Text('widget.voiceLabel!',
+                        style: TextStyle(color: Colors.white.withOpacity(0.6))),
+                  ],
+                ), */
+              ],
+              if (widget.post.emojies.isNotEmpty) ...[
+                const SizedBox(height: 23),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    widget.editable
+                        ? InkWell(
+                            onTap: () {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (context) => EditPostPage(
+                                    post: widget.post,
                                   ),
                                 ),
-                                Positioned(
-                                  right: 0,
-                                  top: 0,
-                                  bottom: 0,
-                                  width: 50,
-                                  child: IgnorePointer(
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        gradient: LinearGradient(
-                                          begin: Alignment.centerLeft,
-                                          end: Alignment.centerRight,
-                                          colors: [
-                                            Colors.transparent,
-                                            Colors.black,
-                                          ],
+                              );
+                            },
+                            child: Container(
+                              height: 30,
+                              decoration: BoxDecoration(
+                                border: Border.all(color: Colors.white10),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 5),
+                              child: Text("ویرایش ادعا",
+                                  style: GoogleFonts.notoSansArabic(
+                                      fontSize: 13, color: Colors.white)),
+                            ))
+                        : const SizedBox.shrink(),
+                    Stack(
+                      children: [
+                        Container(
+                          height: 30,
+                          width: 170,
+                          decoration: BoxDecoration(
+                            color: Colors.black,
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: Colors.white12),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.2),
+                                spreadRadius: 1,
+                                blurRadius: 6,
+                              ),
+                            ],
+                          ),
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Container(
+                              height: 30,
+                              width: 30,
+                              decoration: BoxDecoration(
+                                border: Border.all(color: Colors.white30),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: const Icon(Icons.open_in_full_outlined,
+                                  color: Colors.white, size: 15),
+                            ),
+                            Container(
+                              height: 32,
+                              width: 150,
+                              child: Stack(
+                                children: [
+                                  SingleChildScrollView(
+                                    scrollDirection: Axis.horizontal,
+                                    child: Row(
+                                      children:
+                                          widget.post.emojies.map((emoji) {
+                                        return Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 4, vertical: 7),
+                                          child: EmojiBubble(emoji: emoji),
+                                        );
+                                      }).toList(),
+                                    ),
+                                  ),
+                                  Positioned(
+                                    right: 0,
+                                    top: 0,
+                                    bottom: 0,
+                                    width: 50,
+                                    child: IgnorePointer(
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          gradient: LinearGradient(
+                                            begin: Alignment.centerLeft,
+                                            end: Alignment.centerRight,
+                                            colors: [
+                                              Colors.transparent,
+                                              Colors.black,
+                                            ],
+                                          ),
                                         ),
                                       ),
                                     ),
                                   ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                  widget.editable
-                      ? InkWell(
-                          onTap: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (context) => EditPostPage(
-                                  post: widget.post,
-                                ),
+                                ],
                               ),
-                            );
-                          },
-                          child: Container(
-                            height: 30,
-                            decoration: BoxDecoration(
-                              border: Border.all(color: Colors.white10),
-                              borderRadius: BorderRadius.circular(10),
                             ),
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 10, vertical: 5),
-                            child: Text("ویرایش ادعا",
-                                style: GoogleFonts.notoSansArabic(
-                                    fontSize: 13, color: Colors.white)),
-                          ))
-                      : const SizedBox.shrink(),
-                ],
-              ),
-            ],
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                IconButton(
-                  onPressed: _toggleLike,
-                  icon: Icon(
-                    _isLiked ? Icons.favorite : Icons.favorite_border,
-                    color: _isLiked ? Colors.red : Colors.white,
-                  ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ],
-            ),
-          ],
+              const SizedBox(height: 12),
+              /* Row(
+                children: [
+                  IconButton(
+                    onPressed: _toggleLike,
+                    icon: Icon(
+                      _isLiked ? Icons.favorite : Icons.favorite_border,
+                      color: _isLiked ? Colors.red : Colors.white,
+                    ),
+                  ),
+                ],
+              ), */
+            ],
+          ),
         ),
       ),
     );

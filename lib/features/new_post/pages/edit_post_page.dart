@@ -175,22 +175,21 @@ class _EditPostPageState extends State<EditPostPage> {
                         Icon(Icons.arrow_forward_ios_rounded, size: 12),
                         Expanded(
                           flex: 10,
-                          child: TextField(
-                            controller: _textController,
-                            decoration: InputDecoration(
-                              hintText: 'افزودن موضوع',
-                              hintStyle:
-                                  TextStyle(fontSize: 12, color: Colors.grey),
-                              border: InputBorder.none,
-                            ),
-                            textAlign: TextAlign.right,
+                          child: Text(
+                            'افزودن موضوع',
+                            style: TextStyle(color: Colors.grey, fontSize: 12),
                           ),
                         ),
                       ],
                     ),
-                    subtitle: Text(
-                      'ادعای خودتو اضافه کن ...',
-                      style: TextStyle(color: Colors.grey, fontSize: 12),
+                    subtitle: TextField(
+                      controller: _textController,
+                      decoration: InputDecoration(
+                        hintText: 'ادعای خودتو اضافه کن ...',
+                        hintStyle: TextStyle(fontSize: 12, color: Colors.grey),
+                        border: InputBorder.none,
+                      ),
+                      textAlign: TextAlign.right,
                     ),
                   ),
                   const SizedBox(height: 10),
@@ -231,6 +230,9 @@ class _EditPostPageState extends State<EditPostPage> {
                   ),
                   const SizedBox(height: 30),
                   if (_selectedVideo != null)
+                    /* CropGridViewer.edit(
+                      controller: VideoEditorController.file(_selectedVideo!),
+                    ), */
                     VideoPreviewPlayer(
                       videoFile: _selectedVideo!,
                       maxHeight: double.infinity,
@@ -264,6 +266,8 @@ class _EditPostPageState extends State<EditPostPage> {
                     Center(
                       child: VoicePlayer(
                         audioFile: _recordedAudio!,
+                        height: 40,
+                        width: MediaQuery.of(context).size.width - 140,
                         onClosePressed: () => setState(
                           () {
                             _recordedAudio = null;
