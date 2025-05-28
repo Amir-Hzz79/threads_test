@@ -49,9 +49,19 @@ class _EditPostPageState extends State<EditPostPage> {
   Future<void> _takePhoto() async {
     final XFile? image = await _picker.pickImage(source: ImageSource.camera);
     if (image != null) {
-      setState(() {
-        _selectedImage = File(image.path);
-      });
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => ImageEditorPage(
+            image: File(image.path),
+            onImageEdited: (image) {
+              setState(() {
+                _selectedImage = image;
+                _selectedVideo = null;
+              });
+            },
+          ),
+        ),
+      );
     }
   }
 

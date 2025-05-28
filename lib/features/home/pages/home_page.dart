@@ -17,6 +17,14 @@ class HomePage extends StatelessWidget {
       theme: ThemeData.dark(),
       home: Scaffold(
         backgroundColor: Colors.white10,
+        appBar: AppBar(
+          title: Text(
+            'نمایش',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          centerTitle: true,
+          backgroundColor: Colors.black,
+        ),
         body: SafeArea(
           child: Consumer<PostProvider>(
             builder: (context, postProvider, child) => ScrollableColumn(
@@ -43,7 +51,7 @@ class HomePage extends StatelessWidget {
 
                       return PostCards(
                         post: post,
-                        editable: true,
+                        editable: index == 0,
                       );
                     }),
               ),

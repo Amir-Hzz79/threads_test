@@ -307,16 +307,6 @@ class _PostCardsState extends State<PostCards> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Container(
-                              height: 30,
-                              width: 30,
-                              decoration: BoxDecoration(
-                                border: Border.all(color: Colors.white30),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: const Icon(Icons.open_in_full_outlined,
-                                  color: Colors.white, size: 15),
-                            ),
-                            Container(
                               height: 32,
                               width: 150,
                               child: Stack(
@@ -356,6 +346,16 @@ class _PostCardsState extends State<PostCards> {
                                   ),
                                 ],
                               ),
+                            ),
+                            Container(
+                              height: 30,
+                              width: 30,
+                              decoration: BoxDecoration(
+                                border: Border.all(color: Colors.white30),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: const Icon(Icons.open_in_full_outlined,
+                                  color: Colors.white, size: 15),
                             ),
                           ],
                         ),
