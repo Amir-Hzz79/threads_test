@@ -57,6 +57,7 @@ class _EditPostPageState extends State<EditPostPage> {
               setState(() {
                 _selectedImage = image;
                 _selectedVideo = null;
+                _recordedAudio = null;
               });
             },
           ),
@@ -76,6 +77,7 @@ class _EditPostPageState extends State<EditPostPage> {
               setState(() {
                 _selectedVideo = video;
                 _selectedImage = null;
+                _recordedAudio = null;
               });
             },
           ),
@@ -95,6 +97,7 @@ class _EditPostPageState extends State<EditPostPage> {
               setState(() {
                 _selectedImage = image;
                 _selectedVideo = null;
+                _recordedAudio = null;
               });
             },
           ),
@@ -109,6 +112,8 @@ class _EditPostPageState extends State<EditPostPage> {
       setState(() {
         _recordedAudio = path != null ? File(path) : null;
         _isRecording = false;
+        _selectedVideo = null;
+        _selectedImage = null;
       });
     } else {
       if (await _recorder.hasPermission()) {
@@ -126,6 +131,37 @@ class _EditPostPageState extends State<EditPostPage> {
         });
       }
     }
+  }
+
+  void _submit() {
+    if (_textController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            ' متن ادعا را وارد کنید.',
+            style: TextStyle(color: Colors.white),
+          ),
+          behavior: SnackBarBehavior.floating,
+          dismissDirection: DismissDirection.horizontal,
+          backgroundColor: const Color(0xFF4E4E4E),
+        ),
+      );
+      return;
+    }
+
+    Provider.of<PostProvider>(context, listen: false).updatePost(
+      widget.post.id,
+      Post.fromFile(
+        image: _selectedImage,
+        video: _selectedVideo,
+        audio: _recordedAudio,
+        text: _textController.text,
+        user: FakeData.currentUser,
+        createdAt: widget.post.createdAt,
+      ),
+    );
+
+    Navigator.of(context).pop();
   }
 
   @override
@@ -307,50 +343,14 @@ class _EditPostPageState extends State<EditPostPage> {
                   children: [
                     Expanded(
                       flex: 4,
-                      child: TextField(
-                        decoration: InputDecoration(
-                          hintText:
-                              'هر کسی میتواند ادعای شما رو ببیند و شما رو دوئل دعوت کند.',
-                          hintStyle:
-                              TextStyle(fontSize: 11, color: Colors.grey[300]),
-                          border: InputBorder.none,
-                        ),
+                      child: Text(
+                        'هر کسی میتواند ادعای شما رو ببیند و شما رو دوئل دعوت کند.',
+                        style: TextStyle(fontSize: 11, color: Colors.grey[300]),
                         textAlign: TextAlign.right,
                       ),
                     ),
                     FilledButton(
-                      onPressed: () {
-                        if (_selectedImage == null &&
-                            _selectedVideo == null &&
-                            _recordedAudio == null &&
-                            _textController.text.isEmpty) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('محتوای ادعا را وارد کنید.'),
-                            ),
-                          );
-                          return;
-                        }
-
-                        print('here1');
-                        print(
-                            '-------------------_textController.text:${_textController.text}');
-                        Provider.of<PostProvider>(context, listen: false)
-                            .updatePost(
-                          widget.post.id,
-                          Post.fromFile(
-                            image: _selectedImage,
-                            video: _selectedVideo,
-                            audio: _recordedAudio,
-                            text: _textController.text,
-                            user: FakeData.currentUser,
-                            createdAt: widget.post.createdAt,
-                          ),
-                        );
-                        print('here1-2');
-
-                        Navigator.of(context).pop();
-                      },
+                      onPressed: _submit,
                       style: FilledButton.styleFrom(
                         foregroundColor: Colors.white,
                         backgroundColor: Colors.black,

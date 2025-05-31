@@ -28,9 +28,9 @@ class PostCards extends StatefulWidget {
 class _PostCardsState extends State<PostCards> {
   bool isExpanded = false;
   bool _isMuted = true;
-  bool _isLiked = false;
+  /* bool _isLiked = false; */
   VideoPlayerController? _videoController;
-  Duration? _currentPosition;
+  /* Duration? _currentPosition; */
 
   @override
   void initState() {
@@ -45,7 +45,7 @@ class _PostCardsState extends State<PostCards> {
 
       _videoController!.addListener(() {
         setState(() {
-          _currentPosition = _videoController!.value.position;
+          /* _currentPosition = _videoController!.value.position; */
         });
       });
     }
@@ -57,11 +57,11 @@ class _PostCardsState extends State<PostCards> {
     super.dispose();
   }
 
-  void _toggleLike() {
+  /* void _toggleLike() {
     setState(() {
       _isLiked = !_isLiked;
     });
-  }
+  } */
 
   void _toggleSound() {
     if (_videoController != null) {
